@@ -42,7 +42,7 @@ export default class Recipe {
       "teaspoon",
       "pounds"
     ];
-    const unitsShort = ["tbs", "tbs", "oz", "oz", "cup", "tsp", "tsp", "pound"];
+    const unitsShort = ["tbs", "tbs", "oz", "oz", "cup", "tsp", "tsp", "pound", "g", "kg"];
 
     const newIngredients = this.ingredients.map(el => {
       // Uniforn Units
@@ -58,33 +58,27 @@ export default class Recipe {
       let objIng;
       if (unitIndex > -1) {
         // There is Unit
-        const arrCount = arrIng.splice(0, unitIndex);  // 1 tbsp salt  ,, 1 1/2 tbsl salt
+        const arrCount = arrIng.slice(0, unitIndex);
 
         let count;
-        if(arrCount === 1 ) {
-            count = eval(parseInt(arrIng[0], 10).replace('-', '+'));
-        }
-        else {
-            count = eval(arrCount.join('+'));
+        if (arrCount === 1) {
+          count = eval(parseInt(arrIng[0], 10).replace("-", "+"));
+        } else {
+          count = eval(arrCount.join("+"));
         }
         objIng = {
-            count,
-            unit: arrIng[unitIndex],
-            ingredient:arrIng.slice(unitIndex + 1).join(" ")
-        }
-    }
-
-
-       else if (parseInt(arrIng[0], 10)) {
+          count,
+          unit: arrIng[unitIndex],
+          ingredient: arrIng.slice(unitIndex + 1).join(" ")
+        };
+      } else if (parseInt(arrIng[0], 10)) {
         // There is no Unit but 1st element is Number
         objIng = {
-          count: (parseInt(arrIng[0], 10)),
+          count: parseInt(arrIng[0], 10),
           unit: "",
           ingredient: arrIng.slice(1).join(" ")
         };
-      } 
-      
-      else if (unitIndex == -1) {
+      } else if (unitIndex == -1) {
         // There is no unit and no number in 1st position
         objIng = {
           count: 1,
