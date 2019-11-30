@@ -4,7 +4,6 @@ import * as searchView from "./views/searchView";
 import * as recipeView from "./views/recipeView";
 import { elements, renderLoader, clearLoader } from "./views/base";
 
-
 /* Global state of the app
 1 - Search Object
 2 - Current recipe object
@@ -44,60 +43,71 @@ elements.searchBtn.addEventListener("submit", cur => {
   controlSearch();
 });
 
-elements.searchResPages.addEventListener('click', cur => {
-  const btn = cur.target.closest('.btn-inline');
-  if(btn){
+elements.searchResPages.addEventListener("click", cur => {
+  const btn = cur.target.closest(".btn-inline");
+  if (btn) {
     const goToPage = parseInt(btn.dataset.goto, 10);
     searchView.clearResults();
     searchView.renderResults(state.search.result, goToPage);
   }
-
-})
+});
 
 /*
 Recipe Controller
 */
 
 const controlRecipe = async () => {
-
   // Get ID from URL
-   const id = window.location.hash.replace('#','');
-   if(id){
-
+  const id = window.location.hash.replace("#", "");
+  if (id) {
     // Prepare UI for changes
     recipeView.clearRecipe();
     renderLoader(elements.recipe);
 
     // Highlight the Selected Search Item
-    if(state.search)
-    searchView.highlightSelected(id);
+    if (state.search) searchView.highlightSelected(id);
 
     // Create new Recipe object
     state.recipe = new Recipe(id);
 
-    try{
-         // Get recipe data
-    await state.recipe.getRecipe();
-    state.recipe.parseIngredients();
+    try {
+      // Get recipe data
+      await state.recipe.getRecipe();
+      state.recipe.parseIngredients();
 
-    // Calculate servings and time 
-    state.recipe.calcServings();
-    state.recipe.calcTime();
+      // Calculate servings and time
+      state.recipe.calcServings();
+      state.recipe.calcTime();
 
-    // Render Recipe
-    clearLoader();
-    recipeView.renderRecipe(state.recipe);
-    
-
+      // Render Recipe
+      clearLoader();
+      recipeView.renderRecipe(state.recipe);
+     
+    } catch (error) {
+      alert("Error Loading Recipe!");
     }
-    catch(error){
-      alert('Error Loading Recipe!');
-    }
-
-   }
-}
+  }
+};
 
 // window.addEventListener('hashchange', controlRecipe);
 // window.addEventListener('load', controlRecipe);
 
-['hashchange', 'load'].forEach(event => window.addEventListener(event, controlRecipe));
+["hashchange", "load"].forEach(event =>
+  window.addEventListener(event, controlRecipe)
+);
+
+// Handling recipe serving button clicks
+elements.recipe.addEventListener("click", el => {
+  if (el.target.matches(".btn-decrease, .btn-decrease *")) {
+    if (state.recipe.servings > 1) {
+      // Decrease button is clicked
+      state.recipe.updateServings("dec");
+      recipeView.updateServingsIngredients(state.recipe);
+    }
+  } else if (el.target.matches(".btn-increase, .btn-increase *")) {
+    // Increase button is clicked
+    state.recipe.updateServings("inc");
+    recipeView.updateServingsIngredients(state.recipe);
+  }
+  
+});
