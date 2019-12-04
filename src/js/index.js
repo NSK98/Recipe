@@ -1,7 +1,9 @@
 import Search from "./models/Search";
 import Recipe from "./models/Recipe";
+import List from "./models/List";
 import * as searchView from "./views/searchView";
 import * as recipeView from "./views/recipeView";
+import * as listView from "./views/listView";
 import { elements, renderLoader, clearLoader } from "./views/base";
 
 /* Global state of the app
@@ -82,7 +84,6 @@ const controlRecipe = async () => {
       // Render Recipe
       clearLoader();
       recipeView.renderRecipe(state.recipe);
-     
     } catch (error) {
       alert("Error Loading Recipe!");
     }
@@ -96,6 +97,40 @@ const controlRecipe = async () => {
   window.addEventListener(event, controlRecipe)
 );
 
+
+const controlList = () => {
+
+  // create a new list if there is none
+  if(!state.list) state.list = new List();
+
+  // Add each ingredient to the list and UI
+  state.recipe.ingredients.forEach(el => {
+    const item = state.list.addItem(el.count, el.unit, el.ingredient);
+    listView.renderItem(item);
+  })
+};
+
+// Handle delete and update list item events
+elements.shopping.addEventListener('click', el => {
+  const id = el.target.closest('.shopping__item').dataset.itemid;
+
+  // Handle the delete button
+  if(el.target.matches('.shopping__delete, .shopping__delete *')){
+      // delete item from state
+  state.list.deleteItem(id);
+
+  // delete item from UI
+  listView.deleteItem(id);
+  }
+  
+  // Handle the Update Button
+  else if (el.target.matches('.shopping__count-value')){
+    const val = parseFloat(el.target.value,10);
+    state.list.updateCount(id, val);
+  } 
+
+})
+
 // Handling recipe serving button clicks
 elements.recipe.addEventListener("click", el => {
   if (el.target.matches(".btn-decrease, .btn-decrease *")) {
@@ -108,6 +143,7 @@ elements.recipe.addEventListener("click", el => {
     // Increase button is clicked
     state.recipe.updateServings("inc");
     recipeView.updateServingsIngredients(state.recipe);
+  } else if (el.target.matches(".recipe__btn--add, recipe__btn--add *")) {
+    controlList();
   }
-  
 });
