@@ -88,6 +88,7 @@ const controlRecipe = async () => {
       recipeView.renderRecipe(
         state.recipe,
         state.likes.isLiked(id));
+        console.log(state.recipe);
     } catch (error) {
       alert("Error Loading Recipe!");
       console.log(error)
@@ -201,6 +202,7 @@ state.list = new List();
 // restore list
 state.list.readStorage();
 
+// render existing lists
 state.list.items.forEach(item => listView.renderItem(item));
 })
 

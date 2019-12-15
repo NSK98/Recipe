@@ -1,5 +1,7 @@
 import axios from 'axios';
-//import {key, proxy} from '../config';
+import {key, proxy} from '../config';
+
+//(`https://forkify-api.herokuapp.com/api/search?&q=${this.query}`);
 
 export default class Search {
     constructor(query){
